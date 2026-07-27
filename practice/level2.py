@@ -301,11 +301,76 @@ pd_df = pd.read_parquet("data\\yellow_tripdata_2025-01.parquet")
 
 # Ques - 5 Compare vendor 1 vs vendor 2 in terms of number of average passenger.
 
-avg_passenger_count_by_vendors = (
-    pd_df[pd_df["VendorID"].isin([1, 2])]
-    .groupby("VendorID")["passenger_count"]
-    .mean()
-    .astype(int)
-    .reset_index(name="avg_passenger_count_by_vendors")
-)
-print(avg_passenger_count_by_vendors)
+# avg_passenger_count_by_vendors = (
+#     pd_df[pd_df["VendorID"].isin([1, 2])]
+#     .groupby("VendorID")["passenger_count"]
+#     .mean()
+#     .astype(int)
+#     .reset_index(name="avg_passenger_count_by_vendors")
+# )
+# print(avg_passenger_count_by_vendors)
+
+
+# * Exercise 6 - Passenger Analysis
+
+# Trips by passenger count and average fare amount per passenger count
+
+#! DUCKDB
+
+
+# trips_by_passenger_count = duckdb.sql("""
+# 	SELECT passenger_count, COUNT(*) AS trips_count_per_passenger_count FROM taxi_data
+# 	GROUP BY passenger_count
+#     ORDER BY passenger_count
+
+# """)
+
+# print(trips_by_passenger_count)
+
+# avg_fare_amount_per_passenger_count = duckdb.sql("""
+# 	SELECT passenger_count, AVG(fare_amount) AS avg_fare_per_passenger_count FROM taxi_data
+# 	GROUP BY passenger_count
+#     ORDER BY passenger_count
+# """)
+
+# print(avg_fare_amount_per_passenger_count)
+
+
+#! POLARS
+
+# trips_by_passenger_count = (
+#     pl_df.group_by("passenger_count")
+#     .agg(pl.col("VendorID").count().alias("trips_count_per_passenger_count"))
+#     .sort("passenger_count")
+# )
+
+# print(trips_by_passenger_count)
+
+# avg_fare_amount_per_passenger_count = (
+#     pl_df.group_by("passenger_count")
+#     .agg(pl.col("fare_amount").mean().alias("avg_fare_per_passenger_count"))
+#     .sort("passenger_count")
+# )
+
+# print(avg_fare_amount_per_passenger_count)
+
+
+#! PANDAS
+
+
+# trips_by_passenger_count = (
+#     pd_df.groupby("passenger_count")
+#     .size()
+#     .reset_index(name="trips_by_passenger_count")
+#     .sort_values("passenger_count")
+# )
+
+# print(trips_by_passenger_count)
+
+# avg_fare_per_passenger_count = (
+#     pd_df.groupby("passenger_count")["fare_amount"]
+#     .mean()
+#     .reset_index(name="avg_fare_per_passenger_count")
+# )
+
+# print(avg_fare_per_passenger_count)
